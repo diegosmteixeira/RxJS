@@ -1,28 +1,32 @@
-import { from } from "rxjs";
+import { Observable, from } from "rxjs";
 
 let numbers = [1, 5, 10];
 let source = from(numbers)
 
-class myObserver {
-  next(x: number) {
-    console.log(x)
+// error will stop subscriber function
+// complete will also stop subscriber
+// subscriber -> observable function
+let sourceInstance = new Observable(subscriber => {
+  for (let n of numbers) {
+    if (n > 5)
+      subscriber.error('Unexpected error');
+    subscriber.next(n);
+    subscriber.complete();
   }
-  error(e: Error) {
-    console.log(e)
-  }
-  complete() {
-    console.log('Complete')
-  }
-}
+  subscriber.complete();
+});
 
-const myObserverJson = {
+const myObserver = {
   next: (x: number) => console.log(x),
   error: (e: Error) => console.log(e),
   complete: () => console.log('Complete')
 }
 
 function component() {
-    source.subscribe( new myObserver )
+    source.subscribe(myObserver);
+
+    // Observable(subscriber) will be executed when .subscribe
+    sourceInstance.subscribe(myObserver);
   }
 
 component();
