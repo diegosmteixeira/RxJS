@@ -1,32 +1,41 @@
 import { Observable, from } from "rxjs";
 
-let numbers = [1, 5, 10];
-let source = from(numbers)
+let numbers = [1, 5, 10, 15, 20, 25, 30];
+
+class x {
+  y() {
+  }
+}
+
+let axy = new x();
+axy.y()
 
 // error will stop subscriber function
 // complete will also stop subscriber
 // subscriber -> observable function
-let sourceInstance = new Observable(subscriber => {
-  for (let n of numbers) {
-    if (n > 5)
-      subscriber.error('Unexpected error');
-    subscriber.next(n);
-    subscriber.complete();
+let source = new Observable(subscriber => {
+  let index = 0;
+  let produceValue = () => {
+    subscriber.next(numbers[index++])
+    if (index < numbers.length) {
+      setTimeout(produceValue, 500);
+    } else {
+      subscriber.complete();
+    }
   }
-  subscriber.complete();
+  produceValue();
 });
 
-const myObserver = {
+
+// Observable(subscriber) will be executed when .subscribe
+source.subscribe({
   next: (x: number) => console.log(x),
   error: (e: Error) => console.log(e),
   complete: () => console.log('Complete')
-}
+});
 
-function component() {
-    source.subscribe(myObserver);
-
-    // Observable(subscriber) will be executed when .subscribe
-    sourceInstance.subscribe(myObserver);
-  }
-
-component();
+source.subscribe({
+  next: (x: number) => console.log(x),
+  error: (e: Error) => console.log(e),
+  complete: () => console.log('Complete')
+});
